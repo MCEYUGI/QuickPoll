@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ poll.title }} - 投票</title>
+    <style>
+      .container {
+        max-width: 700px;
+        margin: 2rem auto;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px #e5e7eb;
+        padding: 2rem;
+      }
+      .header {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 1rem;
+      }
+      .section {
+        margin-bottom: 2rem;
+      }
+      .poll-options label {
+        display: block;
+        margin: 0.5rem 0;
+        font-size: 1.1rem;
+      }
+      .btn {
+        background: #60a5fa;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 1rem;
+      }
+      .btn:hover {
+        background: #2563eb;
+      }
+      a {
+        color: #2563eb;
+        text-decoration: none;
+        margin-top: 1rem;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>{{ poll.title }}</h1>
+        <p>{{ poll.description }}</p>
+      </div>
+      <div class="section">
+        <form method="post" action="{% url 'poll_vote' poll.id %}">
+          {% csrf_token %}
+          <div class="poll-options">
+            {% for option in poll.options.all %}
+            <label>
+              <input
+                type="radio"
+                name="option_id"
+                value="{{ option.id }}"
+                required
+              />
+              {{ option.text }}
+            </label>
+            {% endfor %}
+          </div>
+          <button class="btn" type="submit">投票</button>
+        </form>
+        {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %} style="color: red;">
+            {{ message }}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      <a href="{% url 'polls_index' %}">回首頁</a>
+    </div>
+  </body>
+</html>
