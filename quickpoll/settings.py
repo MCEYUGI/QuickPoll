@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-t$*+6@-%$%4*9z8m6x_o%i+m@fbjagyake#=xnfum^!^bspjjz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'quickpoll.zeabur.app',
+    '127.0.0.1',
+    'localhost',
+]
 
 
 # Application definition
