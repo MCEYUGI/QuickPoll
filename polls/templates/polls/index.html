@@ -91,22 +91,15 @@
       }
 
       .section li {
-        padding: 0.7rem 0;
+        display: block;
+        padding-bottom: 1.2em;
+      }
+      .section li:not(:last-child) {
         border-bottom: 1px solid #e5e7eb;
-        font-size: 1.08rem; /* 字體加大 */
-      }
-
-      .section li:last-child {
-        border-bottom: none;
-      }
-
-      .section p {
-        color: #6b7280;
-        font-style: italic;
-        margin: 0;
       }
 
       .section li a {
+        margin-bottom: 0.2em;
         display: block;
         color: #1d4ed8; /* 更深藍色 */
         font-weight: 700;
@@ -128,6 +121,21 @@
         font-size: 0.85em; /* meta 字體稍大 */
         font-weight: 700;
         letter-spacing: 0.2px;
+      }
+
+      .poll-code {
+        display: inline-block;
+        margin: 0.4em 0 0 0;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 0.98em;
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 0.22em 0.8em;
+        letter-spacing: 0.5px;
+        box-shadow: 0 1px 2px #e0e7ff;
+        text-align: left;
+        min-width: 90px;
       }
 
       /* Modal 相關樣式 */
@@ -374,6 +382,33 @@
       .info-section li:hover {
         background: #f1f5f9;
       }
+      .poll-code {
+        display: inline-block;
+        margin: 0.4em 0 0 0;
+        background: #f1f5f9;
+        color: #0a59c8;
+        font-size: 0.98em;
+        font-weight: 550;
+        border-radius: 6px;
+        padding: 0.22em 0.8em;
+        letter-spacing: 0.5px;
+        box-shadow: 0 1px 2px #e0e7ff;
+        text-align: left;
+        min-width: 90px;
+      }
+      .copy-btn {
+        background: none;
+        border: none;
+        color: #2563eb;
+        font-size: 1em;
+        margin-left: 0.4em;
+        cursor: pointer;
+        transition: color 0.2s;
+        padding: 0;
+      }
+      .copy-btn:hover {
+        color: #1d4ed8;
+      }
     </style>
   </head>
   <body>
@@ -418,6 +453,7 @@
                   {{ poll.title }} - {{ poll.created_at|date:"Y-m-d" }}
                 </span>
               </a>
+              <span class="poll-code"> Poll code：{{ poll.poll_code }} </span>
             </li>
             {% endfor %}
           </ul>
@@ -441,6 +477,9 @@
                 >
                   <span class="poll-meta">
                     {{ poll.title }} - {{ poll.created_at|date:"Y-m-d" }}
+                  </span>
+                  <span class="poll-code">
+                    Poll code：{{ poll.poll_code }}
                   </span>
                 </a>
               </li>
