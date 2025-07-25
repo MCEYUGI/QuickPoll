@@ -191,6 +191,18 @@
       /* 當輸入框獲得焦點時，placeholder 文字會淡出 */
       opacity: 0;
     }
+    .messages {
+      color: #e53e3e;
+      margin-bottom: 1rem;
+      list-style-type: none;
+      padding: 0;
+    }
+    .messages li {
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      color: #e53e3e;
+    }
   </style>
 </head>
 <body>
@@ -201,14 +213,7 @@
       </div>
       <p class="title">Login</p>
       <form class="form" method="post" action="">
-        {% csrf_token %} {% if form.errors %}
-        <div
-          class="error"
-          style="color: #f87171; margin-bottom: 10px; text-align: center"
-        >
-          帳號或密碼錯誤，請再試一次。
-        </div>
-        {% endif %}
+        {% csrf_token %}
         <div class="input-group">
           <label for="username">Username</label>
           <input type="text" name="username" id="username" placeholder="" />
@@ -236,6 +241,13 @@
         </div>
         <button class="sign" type="submit">Sign in</button>
       </form>
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
       <p class="signup">
         Don't have an account?
         <a rel="noopener noreferrer" href="/accounts/signup/" class=""

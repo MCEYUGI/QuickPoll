@@ -25,27 +25,31 @@ def signup(request):
     return render(request, 'accounts/signup.html')
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        poll_code = request.POST.get('poll_code')
-        if username and password:
+        poll_code = request.POST.get('poll_code', '').strip()
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+
+        if poll_code:
+            try:
+                poll = Poll.objects.get(poll_code=poll_code)
+                if poll.is_active:
+                    return redirect('vote_by_code', code=poll.poll_code)
+                else:
+                    messages.error(request, '這個投票已經結束或不存在')
+            except Poll.DoesNotExist:
+                messages.error(request, '無效的投票代碼')
+            return render(request, 'accounts/login.html')
+
+        elif username and password:
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 return redirect('polls_index')
             else:
                 messages.error(request, '帳號或密碼錯誤')
-                return render(request, 'accounts/login.html')
-        elif poll_code:
-            # 處理poll_code登入邏輯
-            try: 
-                poll = Poll.objects.get(poll_code=poll_code) # 查詢是否有這個投票代碼
-                if poll.is_active: # 如果這個投票是啟用的
-                    return redirect('poll_detail', poll_id=poll.id)
-                else:
-                    messages.error(request, '這個投票已經結束或不存在')
-                    return render(request, 'accounts/login.html')
-            except Poll.DoesNotExist:
-                messages.error(request, '無效的投票代碼')
-                return render(request, 'accounts/login.html')
+            return render(request, 'accounts/login.html')
+
+        else:
+            messages.error(request, '請輸入帳號與密碼，或投票代碼')
+
     return render(request, 'accounts/login.html')

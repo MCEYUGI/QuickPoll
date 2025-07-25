@@ -53,23 +53,33 @@
         <p>{{ poll.description }}</p>
       </div>
       <div class="section">
+        {% if user.is_authenticated %}
         <form method="post" action="{% url 'poll_vote' poll.id %}">
           {% csrf_token %}
           <div class="poll-options">
             {% for option in poll.options.all %}
             <label>
-              <input
-                type="radio"
-                name="option_id"
-                value="{{ option.id }}"
-                required
-              />
+              <input type="radio" name="option_id" value="{{ option.id }}" required />
               {{ option.text }}
             </label>
             {% endfor %}
           </div>
           <button class="btn" type="submit">投票</button>
         </form>
+        {% else %}
+        <form method="post" action="{% url 'vote_by_code' poll.poll_code %}">
+          {% csrf_token %}
+          <div class="poll-options">
+            {% for option in poll.options.all %}
+            <label>
+              <input type="radio" name="option_id" value="{{ option.id }}" required />
+              {{ option.text }}
+            </label>
+            {% endfor %}
+          </div>
+          <button class="btn" type="submit">匿名投票</button>
+        </form>
+        {% endif %}
         {% if messages %}
         <ul class="messages">
           {% for message in messages %}
@@ -79,6 +89,25 @@
           {% endfor %}
         </ul>
         {% endif %}
+      {% if has_voted %}
+      <div>
+        <div class="section">
+          <h2>投票結果</h2>
+          <ul>
+            {% for option in poll.options.all %}
+            <li>
+              {{ option.text }}: {{ option.votes }} 票 
+              {% if total_votes > 0 %}
+                {% widthratio option.votes total_votes 100 %}%
+              {% else %}
+                0%
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
       </div>
       <a href="{% url 'polls_index' %}">回首頁</a>
     </div>

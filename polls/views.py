@@ -50,11 +50,42 @@ def create_poll(request):
                 )
         # 3. 完成後導回首頁或顯示訊息
         return redirect('polls_index')
-    
-@login_required
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip   
+
+def vote_by_code(request, code):
+    poll = get_object_or_404(Poll, poll_code=code)
+    voter_ip = get_client_ip(request) # 獲取投票者的 IP 地址
+    # 檢查是否投過票了
+    has_voted = Vote.objects.filter(poll=poll, voter_id=voter_ip).exists()
+    if has_voted:
+        messages.error(request, '您已經投過票了，無法再次投票。')
+        return redirect('poll_detail', poll_id=poll.id)
+    #檢查投票是否已結束
+    if not poll.is_active:
+        messages.error(request, '此投票已結束，無法投票。')
+        return redirect('poll_detail', poll_id=poll.id)
+    if request.method == 'POST':
+        option_id = request.POST.get('option_id')
+        option = get_object_or_404(Option, id=option_id, poll=poll)
+        Vote.objects.create(poll=poll, option=option, voter_id=voter_ip)
+        option.votes += 1
+        option.save()
+        messages.success(request, '投票成功！請回首頁。')
+        return redirect('poll_detail', poll_id=poll.id)
+    return redirect('poll_detail', poll_id=poll.id)
+
 def poll_detail(request, poll_id):
     poll = get_object_or_404(Poll, id=poll_id)
-    return render(request, 'polls/poll_detail.html', {'poll': poll})
+    has_voted = Vote.objects.filter(poll=poll, voter_id=str(request.user.id)).exists()
+    total_votes = sum([option.votes for option in poll.options.all()])
+    return render(request, 'polls/poll_detail.html', {'poll': poll, 'has_voted': has_voted, 'total_votes': total_votes})
 
 @login_required
 def poll_vote(request, poll_id):
