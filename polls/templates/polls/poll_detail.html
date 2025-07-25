@@ -18,7 +18,10 @@
         padding-bottom: 1rem;
       }
       .section {
-        margin-bottom: 2rem;
+        margin: auto 0;
+        width: 100%;
+        height: auto;
+        display: flex;
       }
       .poll-options label {
         display: block;
@@ -44,6 +47,45 @@
         margin-top: 1rem;
         display: inline-block;
       }
+      a:hover {
+        text-decoration: underline;
+        color:blue
+      }
+      a:focus{
+        outline: 2px solid #2563eb;
+        outline-offset: 2px;
+      }
+      .results {
+        width: 80%;
+        height: auto;
+        padding: 0 3rem;
+        background: #f3f4f6;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px #e5e7eb;
+      }
+      .results h2 {
+        text-align: center;
+        color: #000000;
+      }
+      .results ul {
+        list-style: none;
+        padding: 0;
+      }
+      .results li {
+        margin: 0.3rem 0;
+        padding: 0.5rem;
+        color: #002f94;
+        font-weight: 600;
+        font-family: "Arial", sans-serif;
+        text-align: center;
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .content {
+        display: flex;
+        justify-content: space-between;
+      }
     </style>
   </head>
   <body>
@@ -52,6 +94,7 @@
         <h1>{{ poll.title }}</h1>
         <p>{{ poll.description }}</p>
       </div>
+      <div class="content">
       <div class="section">
         {% if user.is_authenticated %}
         <form method="post" action="{% url 'poll_vote' poll.id %}">
@@ -80,35 +123,37 @@
           <button class="btn" type="submit">匿名投票</button>
         </form>
         {% endif %}
-        {% if messages %}
-        <ul class="messages">
-          {% for message in messages %}
-          <li{% if message.tags %} class="{{ message.tags }}"{% endif %} style="color: red;">
-            {{ message }}
-          </li>
-          {% endfor %}
-        </ul>
-        {% endif %}
+      </div>
       {% if has_voted %}
-      <div>
-        <div class="section">
+      <div class="results">
           <h2>投票結果</h2>
           <ul>
             {% for option in poll.options.all %}
             <li>
+              {% if option == best_option %} 
+              <strong style="color: red;">(Top)</strong>
+              {% endif %}
               {{ option.text }}: {{ option.votes }} 票 
               {% if total_votes > 0 %}
-                {% widthratio option.votes total_votes 100 %}%
+                    {% widthratio option.votes total_votes 100 %}%
               {% else %}
                 0%
               {% endif %}
             </li>
             {% endfor %}
           </ul>
-        </div>
+      </div>
       </div>
       {% endif %}
-      </div>
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %} style="color: red; margin-left: -1.5rem;">
+            {{ message }}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
       <a href="{% url 'polls_index' %}">回首頁</a>
     </div>
   </body>

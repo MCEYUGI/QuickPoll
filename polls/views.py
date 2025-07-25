@@ -83,9 +83,14 @@ def vote_by_code(request, code):
 
 def poll_detail(request, poll_id):
     poll = get_object_or_404(Poll, id=poll_id)
-    has_voted = Vote.objects.filter(poll=poll, voter_id=str(request.user.id)).exists()
     total_votes = sum([option.votes for option in poll.options.all()])
-    return render(request, 'polls/poll_detail.html', {'poll': poll, 'has_voted': has_voted, 'total_votes': total_votes})
+    best_option = poll.options.order_by('votes').last()  # 獲取得票最多的選項
+    if request.user.is_authenticated:
+        has_voted = Vote.objects.filter(poll=poll, voter_id=str(request.user.id)).exists()
+        return render(request, 'polls/poll_detail.html', {'poll': poll, 'has_voted': has_voted, 'total_votes': total_votes, 'best_option': best_option})
+    else:
+        has_voted = Vote.objects.filter(poll=poll, voter_id=get_client_ip(request)).exists()
+        return render(request, 'polls/poll_detail.html', {'poll': poll, 'has_voted': has_voted, 'total_votes': total_votes, 'best_option': best_option})
 
 @login_required
 def poll_vote(request, poll_id):
